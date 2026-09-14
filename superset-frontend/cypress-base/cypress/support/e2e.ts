@@ -82,8 +82,6 @@ before(() => {
   if (skipLogin()) {
     return;
   }
-  cy.login();
-  Cypress.Cookies.defaults({ preserve: 'session' });
   cy.loadChartFixtures();
   cy.loadDashboardFixtures();
 });
@@ -92,6 +90,7 @@ beforeEach(() => {
   if (skipLogin()) {
     return;
   }
+  cy.login();
   cy.cleanDashboards();
   cy.cleanCharts();
 });
@@ -178,24 +177,30 @@ Cypress.on('uncaught:exception', err => {
 /* eslint-enable consistent-return */
 
 Cypress.Commands.add('login', () => {
-  cy.request({
-    method: 'POST',
-    url: '/login/',
-    body: { username: 'admin', password: 'general' },
-  }).then(response => {
-    if (response.status === 302) {
-      // If there's a redirect, follow it manually
-      const redirectUrl = response.headers.location;
+  cy.session(
+    'admin',
+    () => {
       cy.request({
-        method: 'GET',
-        url: redirectUrl,
-      }).then(finalResponse => {
-        expect(finalResponse.status).to.eq(200);
+        method: 'POST',
+        url: '/login/',
+        body: { username: 'admin', password: 'general' },
+      }).then(response => {
+        if (response.status === 302) {
+          // If there's a redirect, follow it manually
+          const redirectUrl = response.headers.location;
+          cy.request({
+            method: 'GET',
+            url: redirectUrl,
+          }).then(finalResponse => {
+            expect(finalResponse.status).to.eq(200);
+          });
+        } else {
+          expect(response.status).to.eq(200);
+        }
       });
-    } else {
-      expect(response.status).to.eq(200);
-    }
-  });
+    },
+    { cacheAcrossSpecs: true },
+  );
 });
 
 Cypress.Commands.add('visitChartByName', name => {
@@ -276,7 +281,7 @@ Cypress.Commands.add(
     querySubstring,
     chartSelector,
   }: {
-    waitAlias: string;
+    waitAlias: `@${string}`;
     chartSelector: JQuery.Selector;
     querySubstring?: string | RegExp;
   }) => {
