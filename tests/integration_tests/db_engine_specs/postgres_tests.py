@@ -479,6 +479,7 @@ def test_base_parameters_mixin():
     json_schema = PostgresEngineSpec.parameters_json_schema()
     assert json_schema == {
         "type": "object",
+        "additionalProperties": False,
         "properties": {
             "encryption": {
                 "type": "boolean",
