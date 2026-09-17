@@ -40,9 +40,14 @@ requests>=2.33.0,<3.0.0
 # -> https://github.com/aio-libs/async-timeout/blob/master/CHANGES.rst#500-2024-10-31
 async_timeout>=4.0.0,<5.0.0
 
-# Known issue with 6.7.0 breaking a unit test, probably easy to fix, but will require
-# a bit of attention to bump.
-apispec>=6.0.0,<6.7.0
+# The generated OpenAPI document depends on the apispec release: 6.7.0 started
+# emitting `additionalProperties` for `fields.Dict()` without a value field,
+# 6.7.1 changed how nullable `Nested` fields render in OAS 3.0, and 6.8.3 emits
+# `additionalProperties` according to a schema's `unknown` setting.
+# docs/static/resources/openapi.json is generated with that behavior, so older
+# releases regenerate a different spec and fail the drift check. The major
+# version is capped because a 7.x release may change the output again.
+apispec>=6.8.3,<7.0.0
 
 # 1.4.1 introduced a memory regression that exhausts memory in the test suite
 # (https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/665). 1.4.2
