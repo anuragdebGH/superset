@@ -56,7 +56,7 @@ declare namespace Cypress {
      * Verify slice successfully loaded.
      */
     verifySliceSuccess(options: {
-      waitAlias: string;
+      waitAlias: `@${string}`;
       querySubstring?: string | RegExp;
       chartSelector?: JQuery.Selector;
     }): cy;
