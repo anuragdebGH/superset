@@ -40,7 +40,10 @@
       // Using /ui path matches the established pattern used throughout the Superset codebase
       "@apache-superset/core/components": ["./src/types/apache-superset-core"],
       "@site/*": ["./*"],
-      "*": ["./src/*", "./node_modules/*"]
+      // @types must precede the package itself so that packages shipping only
+      // JavaScript (react, react-dom) still resolve to their DefinitelyTyped
+      // declarations instead of the untyped entry point.
+      "*": ["./src/*", "./node_modules/@types/*", "./node_modules/*"]
     }
   },
   "include": ["./src/**/*.ts", "./src/**/*.tsx", "./src/**/*.d.ts"],
